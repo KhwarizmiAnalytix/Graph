@@ -1,0 +1,34 @@
+XSigma: High-Performance Computational Library
+Copyright (c) 2025 XSigmaAnalyitix
+
+Dual License Model
+------------------
+
+This project is licensed under a dual-licensing scheme:
+
+1. Open-Source License (GPL-3.0-or-later):
+   You may use, modify, and redistribute this software under the terms
+   of the GNU General Public License, version 3 or (at your option)
+   any later version, as published by the Free Software Foundation.
+
+   See: LICENSES/GPL-3.0-or-later.txt
+
+2. Commercial License (XSigma Commercial License):
+   A separate commercial license is available for organizations and
+   individuals who wish to use this software in proprietary, closed-source,
+   or SaaS applications without being subject to the copyleft provisions
+   of the GPL.
+
+   See: LICENSES/XSigma-Commercial.txt
+
+You may choose which license applies to your use of XSigma.
+
+SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-XSigma-Commercial
+
+-------------------------------------------------------------------------------
+Contact
+-------------------------------------------------------------------------------
+For commercial licensing inquiries, please contact:
+
+  Email: licensing@xsigma.co.uk
+  Website: https://www.xsigma.co.uk

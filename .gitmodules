@@ -1,0 +1,9 @@
+[submodule "ThirdParty/Parallel"]
+  path = ThirdParty/Parallel
+  url = https://github.com/KhwarizmiAnalytix/Parallel.git
+[submodule "ThirdParty/googletest"]
+  path = ThirdParty/googletest
+  url = https://github.com/google/googletest.git
+[submodule "ThirdParty/benchmark"]
+  path = ThirdParty/benchmark
+  url = https://github.com/google/benchmark.git
