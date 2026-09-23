@@ -14,7 +14,5 @@ list(PREPEND CMAKE_MODULE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}/Cmake/tools"
   "${CMAKE_CURRENT_SOURCE_DIR}/Cmake/flags"
   "${CMAKE_CURRENT_SOURCE_DIR}/Cmake/packages")
-if(NOT COMMAND add_third_party_library)
-  add_subdirectory(ThirdParty)
-endif()
+include("${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CMakeLists.txt")
 add_subdirectory(Graph)

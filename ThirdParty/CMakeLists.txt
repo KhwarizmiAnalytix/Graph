@@ -23,8 +23,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Path to this ThirdParty directory — used by library modules that call
 # add_third_party_library() with absolute SOURCE_DIR / INCLUDE_DIR paths.
-set(XSIGMA_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH
-    "Root directory of XSigma's bundled third-party sources" FORCE)
+set(XSIGMA_THIRDPARTY_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 # =============================================================================
 # Helper Functions for Third-Party Library Management
