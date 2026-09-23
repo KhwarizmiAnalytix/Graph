@@ -146,15 +146,15 @@ target_include_directories(
   Graph
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Testing>
-         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/Testing>
+         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Testing>
+         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/Testing>
          $<INSTALL_INTERFACE:include>
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GraphTest.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Testing/GraphTest.h" @ONLY
+  "${CMAKE_SOURCE_DIR}/Testing/GraphTest.h.in"
+  "${CMAKE_BINARY_DIR}/Testing/GraphTest.h" @ONLY
 )
 
 if(GRAPH_ENABLE_CLANGTIDY)
@@ -179,7 +179,7 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/" DESTINATION include/Graph
         FILES_MATCHING PATTERN "*.h" PATTERN "Testing" EXCLUDE)
 
 if(GRAPH_ENABLE_TESTING)
-  add_subdirectory(Testing/Cxx)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/Testing/Cxx ${CMAKE_BINARY_DIR}/Testing/Cxx)
 endif()
 if(GRAPH_ENABLE_VALGRIND AND GRAPH_ENABLE_TESTING)
   xsigma_apply_valgrind_timeouts()
