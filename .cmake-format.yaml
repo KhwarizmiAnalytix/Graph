@@ -1,0 +1,183 @@
+# cmake-format configuration for XSigma
+# Aligns with .clang-format and project coding standards
+# See: https://cmake-format.readthedocs.io/
+#
+# This configuration is compatible with:
+# - cmake-format (cmakelang) 0.6.13
+# - cmakelint 1.4.1
+#
+# Configuration validated against cmake-format --dump-config output
+# to ensure all options are recognized and properly formatted.
+
+# Options affecting formatting
+format:
+  # Disable formatting entirely (set to true to make cmake-format a no-op)
+  disable: false
+
+  # Line width - matches .clang-format ColumnLimit: 100
+  # This ensures consistency across CMake and C++ code formatting
+  line_width: 100
+
+  # Tab size - how many spaces to use for indentation
+  # Matches project standard of 2-space indentation
+  tab_size: 2
+
+  # Use spaces instead of tab characters for indentation
+  use_tabchars: false
+
+  # Fractional tab policy - how to handle fractional indentations
+  # 'use-space' means fractional indentation is left as spaces
+  fractional_tab_policy: use-space
+
+  # If an argument group contains more than this many sub-groups,
+  # force it to a vertical layout for better readability
+  max_subgroups_hwrap: 3
+
+  # If a positional argument group contains more than this many arguments,
+  # force it to a vertical layout
+  max_pargs_hwrap: 6
+
+  # If a cmdline positional group consumes more than this many lines
+  # without nesting, then invalidate the layout (and nest)
+  max_rows_cmdline: 2
+
+  # Do NOT separate flow control names (if, while, etc.) from their parentheses with a space
+  # Example: if(condition) instead of if (condition)
+  # This aligns with cmakelint's whitespace/extra check which flags spaces after control flow keywords
+  separate_ctrl_name_with_space: false
+
+  # Do NOT separate function names from parentheses with a space
+  # Example: function(args) instead of function (args)
+  separate_fn_name_with_space: false
+
+  # If a statement is wrapped to more than one line,
+  # dangle the closing parenthesis on its own line
+  dangle_parens: true
+
+  # Alignment for dangling parenthesis
+  # 'prefix' means align to the start of the statement
+  dangle_align: prefix
+
+  # Minimum prefix characters before rejecting nested layouts
+  min_prefix_chars: 4
+
+  # Maximum prefix characters before rejecting un-nested layouts
+  max_prefix_chars: 10
+
+  # Maximum lines for horizontal wrapping before rejecting the layout
+  max_lines_hwrap: 2
+
+  # Line ending style - use unix line endings (\n)
+  line_ending: unix
+
+  # Format command names consistently
+  # 'canonical' preserves the canonical case (usually lowercase for CMake commands)
+  command_case: canonical
+
+  # Format keywords consistently
+  # 'unchanged' preserves the original case of keywords
+  keyword_case: unchanged
+
+  # List of command names which should always be wrapped
+  always_wrap: []
+
+  # Enable sorting of argument lists that are known to be sortable
+  enable_sort: true
+
+  # Do not automatically infer whether argument lists are sortable
+  # This prevents unexpected reordering of arguments
+  autosort: false
+
+  # Do not require valid layout - allow cmake-format to do its best
+  # even if it cannot fit everything into the desired line width
+  require_valid_layout: false
+
+  # Layout passes configuration (advanced)
+  layout_passes: {}
+
+# Options affecting comment reflow and formatting
+markup:
+  # Character to use for bulleted lists in comments
+  bullet_char: '*'
+
+  # Character to use as punctuation after numerals in enumerated lists
+  enum_char: '.'
+
+  # Do not treat the first comment block as literal
+  # Set to true to preserve copyright/license statement formatting
+  first_comment_is_literal: false
+
+  # Pattern for literal comment blocks (null means no special pattern)
+  literal_comment_pattern: null
+
+  # Pattern for code fence markers in comments
+  fence_pattern: '^\\s*([`~]{3}[`~]*)(.*)$'
+
+  # Pattern for horizontal rulers in comments
+  ruler_pattern: '^\\s*[*]{10,}$'
+
+  # Hashruler pattern for comment section dividers
+  hashruler_min_length: 10
+
+  # Canonicalize hashrulers to this character
+  canonicalize_hashrulers: true
+
+  # Disable comment markup/reflow so "# =====...=====" rulers stay on their own line and the next
+  # "# ..." line (titles, instructions) is not merged onto the ruler or reflowed into paragraph text.
+  # cmakelang only auto-preserves rulers that start with hashruler_min_length '#' chars; XSigma
+  # uses "# =" dividers, which otherwise get parsed as plain comments and joined with following lines.
+  enable_markup: false
+
+# Options affecting listfile parsing
+parse:
+  # Additional custom commands (none for XSigma currently)
+  additional_commands: {}
+
+  # Override configurations per-command where available
+  override_spec: {}
+
+  # Variable tags for special variable handling
+  vartags: []
+
+  # Property tags for special property handling
+  proptags: []
+
+# Lint configuration
+# Note: These patterns are used by cmake-lint, not cmake-format
+# They are included here for reference and potential future use
+lint:
+  # Disabled lint codes (empty means all checks are enabled)
+  disabled_codes: []
+
+  # Pattern for function names (lowercase with underscores)
+  function_pattern: '[0-9a-z_]+'
+
+  # Pattern for macro names (uppercase with underscores)
+  macro_pattern: '[0-9A-Z_]+'
+
+  # Pattern for global variables (uppercase with underscores)
+  global_var_pattern: '[A-Z][0-9A-Z_]*'
+
+  # Pattern for internal variables (leading underscore, uppercase)
+  internal_var_pattern: '_[A-Z][0-9A-Z_]*'
+
+  # Pattern for local variables (lowercase with underscores)
+  local_var_pattern: '[a-z][a-z0-9_]*'
+
+  # Pattern for private variables (leading underscore, lowercase)
+  private_var_pattern: '_[a-z][a-z0-9_]*'
+
+  # Pattern for public variables (uppercase with underscores)
+  public_var_pattern: '[A-Z][A-Z0-9_]*'
+
+  # Pattern for argument variables (lowercase with underscores)
+  argument_var_pattern: '[a-z][a-z0-9_]*'
+
+  # Pattern for keywords (uppercase with underscores)
+  keyword_pattern: '[A-Z][A-Z0-9_]*'
+
+  # Maximum number of newlines between statements
+  max_statement_spacing: 2
+
+  # Minimum number of newlines between statements (0 allows consecutive statements)
+  min_statement_spacing: 0
