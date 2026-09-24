@@ -274,7 +274,6 @@ is_formatter = true
 # ==============================================================================
 
 [[linter]]
-[[linter]]
 code = 'PYREFLY'
 include_patterns = ['**/*.py', 'Scripts/**/*.py']
 exclude_patterns = [
@@ -414,10 +413,10 @@ command = [
     'python3',
     '-m',
     'lint_tool.adapters.grep_linter',
-    '--pattern=	',
+    '--pattern=  ',
     '--linter-name=TABS',
     '--error-name=tabs in code',
-    '--replace-pattern=s/	/  /g',
+    '--replace-pattern=s/  /  /g',
     '--error-description=Please use spaces instead of tabs.',
     '--',
     '@{{PATHSFILE}}',
@@ -643,7 +642,7 @@ include_patterns = ['.lintrunner.toml']
 command = [
     'python3',
     '-m',
-    'lint_tool.adapters.lintrunner_version',
+    'lint_tool.adapters.lintrunner_version_linter',
 ]
 
 [[linter]]
