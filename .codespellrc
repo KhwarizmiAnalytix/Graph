@@ -1,0 +1,4 @@
+[tool.codespell]
+ignore-words = "Scripts/suppressions/spell_suppressions.txt"
+skip = ".git,.github,.vscode,ThirdParty,build,build_*"
+check-hidden = false
