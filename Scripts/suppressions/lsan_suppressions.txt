@@ -1,0 +1,12 @@
+# LeakSanitizer suppressions for Logging.
+#
+# loguru::set_thread_name() stores the thread name via
+# pthread_setspecific(key, strdup(name)), with a pthread_key_create(&key, free)
+# destructor that properly frees it on normal thread exit. LSan still flags it
+# because the *main* thread of a test binary returns from main() rather than
+# calling pthread_exit() -- glibc does not run a thread's own pthread-key
+# destructors in that case, so the main thread's one-time allocation is never
+# freed before process exit. This is a well-known, benign false positive for
+# this exact pattern, not a real leak: verified against
+# ThirdParty/loguru/loguru.cpp's set_thread_name()/make_pthread_key_name().
+leak:loguru::set_thread_name

@@ -1,0 +1,11 @@
+# =============================================================================
+# Clang sanitizer special case list (see -fsanitize-blacklist)
+# =============================================================================
+# Consumed by Cmake/sanitize.cmake (xsigma_configure_sanitizer) via configure_file
+# whenever LOGGING_ENABLE_SANITIZER=ON with Clang. Entries with no bracketed
+# [tool] header apply to every sanitizer (ASan, UBSan, TSan, MSan, LSan).
+#
+# Vendored ThirdParty/ sources are excluded: Logging does not own their code,
+# and instrumenting them only adds noise (and, for prebuilt/optimized paths,
+# false positives) to reports scoped to this library.
+src:*/ThirdParty/*
