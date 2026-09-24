@@ -353,6 +353,7 @@ command = [
 code = 'NEWLINE'
 include_patterns = ['**']
 exclude_patterns = [
+    '.lintrunner.toml',
     'ThirdParty/**',
     '.git/**',
     'bazel-*/**',
@@ -376,6 +377,7 @@ is_formatter = true
 code = 'SPACES'
 include_patterns = ['**']
 exclude_patterns = [
+    '.lintrunner.toml',
     'ThirdParty/**',
     '.git/**',
     'bazel-*/**',
@@ -401,6 +403,7 @@ command = [
 code = 'TABS'
 include_patterns = ['**']
 exclude_patterns = [
+    '.lintrunner.toml',
     'ThirdParty/**',
     '.git/**',
     'bazel-*/**',
