@@ -273,79 +273,79 @@ is_formatter = true
 # PYTHON TYPE & IMPORT CHECKING
 # ==============================================================================
 
-# [DISABLED] PYREFLY - installation issues with pyrefly package
-# [[linter]]
-# code = 'PYREFLY'
-# include_patterns = ['**/*.py', 'Scripts/**/*.py']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-#     '__pycache__/**',
-# ]
-# init_command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.pip_init',
-#     '--dry-run={{DRYRUN}}',
-#     'pyrefly>=0.0.50',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.pyrefly_linter',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
+[[linter]]
+[[linter]]
+code = 'PYREFLY'
+include_patterns = ['**/*.py', 'Scripts/**/*.py']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+    '__pycache__/**',
+]
+init_command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.pip_init',
+    '--dry-run={{DRYRUN}}',
+    'pyrefly>=0.0.50',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.pyrefly_linter',
+    '--',
+    '@{{PATHSFILE}}',
+]
 
-# [DISABLED] IMPORT_LINTER - optional adapter
-# code = 'IMPORT_LINTER'
-# include_patterns = ['**/*.py', 'Scripts/**/*.py']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-#     '__pycache__/**',
-# ]
-# init_command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.pip_init',
-#     '--dry-run={{DRYRUN}}',
-#     'lint-import-linter==1.11.0',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.import_linter',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] DOCSTRING_LINTER - optional adapter
-# code = 'DOCSTRING_LINTER'
-# include_patterns = ['**/*.py', 'Scripts/**/*.py']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-#     '__pycache__/**',
-# ]
-# init_command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.pip_init',
-#     '--dry-run={{DRYRUN}}',
-#     'pydocstyle==6.3.0',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.docstring_linter',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
+[[linter]]
+code = 'IMPORT_LINTER'
+include_patterns = ['**/*.py', 'Scripts/**/*.py']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+    '__pycache__/**',
+]
+init_command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.pip_init',
+    '--dry-run={{DRYRUN}}',
+    'lint-import-linter>=1.0.0',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.import_linter',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'DOCSTRING_LINTER'
+include_patterns = ['**/*.py', 'Scripts/**/*.py']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+    '__pycache__/**',
+]
+init_command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.pip_init',
+    '--dry-run={{DRYRUN}}',
+    'pydocstyle>=6.0.0',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.docstring_linter',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
 # ==============================================================================
 # WHITESPACE & FORMATTING
 # ==============================================================================
@@ -414,10 +414,10 @@ command = [
     'python3',
     '-m',
     'lint_tool.adapters.grep_linter',
-    '--pattern=  ',
+    '--pattern=	',
     '--linter-name=TABS',
     '--error-name=tabs in code',
-    '--replace-pattern=s/  /  /g',
+    '--replace-pattern=s/	/  /g',
     '--error-description=Please use spaces instead of tabs.',
     '--',
     '@{{PATHSFILE}}',
@@ -473,7 +473,7 @@ init_command = [
     '-m',
     'lint_tool.adapters.pip_init',
     '--dry-run={{DRYRUN}}',
-    'editorconfig-checker==3.0.3',
+    'editorconfig-checker>=3.0.0',
 ]
 command = [
     'python3',
@@ -521,250 +521,249 @@ command = [
     '@{{PATHSFILE}}',
 ]
 
-# [DISABLED] COPYRIGHT - optional adapter
-# code = 'COPYRIGHT'
-# include_patterns = [
-#     'include/**/*.h',
-#     'include/**/*.hpp',
-#     'include/**/*.cpp',
-#     'Testing/**/*.h',
-#     'Testing/**/*.cpp',
-# ]
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.grep_linter',
-#     '--invert-match',
-#     '--pattern=(Copyright|SPDX-License)',
-#     '--linter-name=COPYRIGHT',
-#     '--error-name=missing copyright header',
-#     '--error-description=Add copyright/SPDX header to this file.',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
+[[linter]]
+code = 'COPYRIGHT'
+include_patterns = [
+    'include/**/*.h',
+    'include/**/*.hpp',
+    'include/**/*.cpp',
+    'Testing/**/*.h',
+    'Testing/**/*.cpp',
+]
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.grep_linter',
+    '--invert-match',
+    '--pattern=(Copyright|SPDX-License)',
+    '--linter-name=COPYRIGHT',
+    '--error-name=missing copyright header',
+    '--error-description=Add copyright/SPDX header to this file.',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
 # ==============================================================================
 # CI/CD & SCRIPTS
 # ==============================================================================
 
-# [DISABLED] GHA - CI/CD only
-# code = 'GHA'
-# include_patterns = ['.github/workflows/**/*.yml', '.github/workflows/**/*.yaml']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.gha_linter',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] ACTIONLINT - CI/CD only
-# code = 'ACTIONLINT'
-# include_patterns = ['.github/workflows/**/*.yml', '.github/workflows/**/*.yaml']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# init_command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.s3_init',
-#     '--linter=actionlint',
-#     '--dry-run={{DRYRUN}}',
-#     '--output-dir=.lintbin',
-#     '--output-name=actionlint',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.actionlint_linter',
-#     '--binary=.lintbin/actionlint',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] SHELLCHECK - CI/CD only
-# code = 'SHELLCHECK'
-# include_patterns = ['**/*.sh', 'Scripts/**/*.sh']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-#     'build_*/**',
-# ]
-# init_command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.s3_init',
-#     '--linter=shellcheck',
-#     '--dry-run={{DRYRUN}}',
-#     '--output-dir=.lintbin',
-#     '--output-name=shellcheck',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.shellcheck_linter',
-#     '--binary=.lintbin/shellcheck',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] EXEC - CI/CD only
-# code = 'EXEC'
-# include_patterns = ['Scripts/**', 'tools/**', 'bin/**']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.exec_linter',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
+[[linter]]
+code = 'GHA'
+include_patterns = ['.github/workflows/**/*.yml', '.github/workflows/**/*.yaml']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.gha_linter',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'ACTIONLINT'
+include_patterns = ['.github/workflows/**/*.yml', '.github/workflows/**/*.yaml']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+init_command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.s3_init',
+    '--linter=actionlint',
+    '--dry-run={{DRYRUN}}',
+    '--output-dir=.lintbin',
+    '--output-name=actionlint',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.actionlint_linter',
+    '--binary=.lintbin/actionlint',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'SHELLCHECK'
+include_patterns = ['**/*.sh', 'Scripts/**/*.sh']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+    'build_*/**',
+]
+init_command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.s3_init',
+    '--linter=shellcheck',
+    '--dry-run={{DRYRUN}}',
+    '--output-dir=.lintbin',
+    '--output-name=shellcheck',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.shellcheck_linter',
+    '--binary=.lintbin/shellcheck',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'EXEC'
+include_patterns = ['Scripts/**', 'tools/**', 'bin/**']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.exec_linter',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
 # ==============================================================================
 # METADATA & VERSIONING
 # ==============================================================================
 
-# [DISABLED] LINTRUNNER_VERSION - optional adapter
-# code = 'LINTRUNNER_VERSION'
-# include_patterns = ['.lintrunner.toml']
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.lintrunner_version',
-# ]
-#
-# [DISABLED] BAZEL_LINTER - CI/CD only
-# code = 'BAZEL_LINTER'
-# include_patterns = ['BUILD', 'BUILD.bazel', 'WORKSPACE', 'WORKSPACE.bazel', '**/*.bzl']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.bazel_linter',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
+[[linter]]
+code = 'LINTRUNNER_VERSION'
+include_patterns = ['.lintrunner.toml']
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.lintrunner_version',
+]
+
+[[linter]]
+code = 'BAZEL_LINTER'
+include_patterns = ['BUILD', 'BUILD.bazel', 'WORKSPACE', 'WORKSPACE.bazel', '**/*.bzl']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.bazel_linter',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
 # ==============================================================================
 # SPECIALIZED CHECKERS
 # ==============================================================================
 
-# [DISABLED] ROOT_LOGGING - optional adapter
-# code = 'ROOT_LOGGING'
-# include_patterns = [
-#     'include/**/*.h',
-#     'include/**/*.cpp',
-#     'include/**/*.cxx',
-# ]
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.grep_linter',
-#     '--pattern=LOG(.*)\|SPDLOG.*\|logger->',
-#     '--invert-match',
-#     '--linter-name=ROOT_LOGGING',
-#     '--error-name=logging not from logger param',
-#     '--error-description=Use logger->info/debug/warn/error instead of direct logging.',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] NOQA - optional adapter
-# code = 'NOQA'
-# include_patterns = ['**/*.py', '**/*.cpp', '**/*.h']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.grep_linter',
-#     '--pattern=noqa|NOLINT|pylint:.*disable',
-#     '--linter-name=NOQA',
-#     '--error-name=suppression directive found',
-#     '--error-description=Code has inline suppressions; review if necessary or remove.',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] PYPIDEP - optional adapter
-# code = 'PYPIDEP'
-# include_patterns = ['pyproject.toml', 'setup.py', 'requirements*.txt']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.pip_init',
-#     '--check-deps',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] TYPEIGNORE - optional adapter
-# code = 'TYPEIGNORE'
-# include_patterns = ['**/*.py']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-#     '__pycache__/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.grep_linter',
-#     '--pattern=type:.*ignore',
-#     '--linter-name=TYPEIGNORE',
-#     '--error-name=type ignore directive',
-#     '--error-description=Code has type ignore; review necessity.',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
-# [DISABLED] TYPENOSKIP - optional adapter
-# code = 'TYPENOSKIP'
-# include_patterns = ['**/*.py']
-# exclude_patterns = [
-#     'ThirdParty/**',
-#     '.git/**',
-#     'build/**',
-#     '__pycache__/**',
-# ]
-# command = [
-#     'python3',
-#     '-m',
-#     'lint_tool.adapters.grep_linter',
-#     '--pattern=no_skip_libs\|no_skip_check',
-#     '--invert-match',
-#     '--linter-name=TYPENOSKIP',
-#     '--error-name=type skip not configured',
-#     '--error-description=Configure skip settings in mypy config.',
-#     '--',
-#     '@{{PATHSFILE}}',
-# ]
-#
+[[linter]]
+code = 'ROOT_LOGGING'
+include_patterns = [
+    'include/**/*.h',
+    'include/**/*.cpp',
+    'include/**/*.cxx',
+]
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.grep_linter',
+    '--pattern=LOG(.*)\|SPDLOG.*\|logger->',
+    '--invert-match',
+    '--linter-name=ROOT_LOGGING',
+    '--error-name=logging not from logger param',
+    '--error-description=Use logger->info/debug/warn/error instead of direct logging.',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'NOQA'
+include_patterns = ['**/*.py', '**/*.cpp', '**/*.h']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.grep_linter',
+    '--pattern=noqa|NOLINT|pylint:.*disable',
+    '--linter-name=NOQA',
+    '--error-name=suppression directive found',
+    '--error-description=Code has inline suppressions; review if necessary or remove.',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'PYPIDEP'
+include_patterns = ['pyproject.toml', 'setup.py', 'requirements*.txt']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.pip_init',
+    '--check-deps',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'TYPEIGNORE'
+include_patterns = ['**/*.py']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+    '__pycache__/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.grep_linter',
+    '--pattern=type:.*ignore',
+    '--linter-name=TYPEIGNORE',
+    '--error-name=type ignore directive',
+    '--error-description=Code has type ignore; review necessity.',
+    '--',
+    '@{{PATHSFILE}}',
+]
+
+[[linter]]
+code = 'TYPENOSKIP'
+include_patterns = ['**/*.py']
+exclude_patterns = [
+    'ThirdParty/**',
+    '.git/**',
+    'build/**',
+    '__pycache__/**',
+]
+command = [
+    'python3',
+    '-m',
+    'lint_tool.adapters.grep_linter',
+    '--pattern=no_skip_libs\|no_skip_check',
+    '--invert-match',
+    '--linter-name=TYPENOSKIP',
+    '--error-name=type skip not configured',
+    '--error-description=Configure skip settings in mypy config.',
+    '--',
+    '@{{PATHSFILE}}',
+]
