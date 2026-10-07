@@ -1,0 +1,23 @@
+# Pyrefly configuration — referenced by the PYREFLY linter in .lintrunner.toml
+# (the adapter runs `pyrefly check --config pyrefly.toml`, which type-checks the
+# project per this file rather than the linter's own include/exclude patterns,
+# so the vendored/build trees are excluded here too).
+project-includes = ["Scripts"]
+project-excludes = [
+    "**/.[!/.]*",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/*venv/**",
+    "ThirdParty/**",
+    "**/experimental/**",
+    "**/Experimental/**",
+    "build*/**",
+    # excluded for the same reason MYPY excludes it: defensive patterns like
+    # `if "x" in locals()` guards and re-match re-evaluation false-positive here.
+    "Scripts/setup.py",
+]
+
+# Import roots mirroring how the scripts actually run: setup.py and the helpers
+# package resolve from Scripts/. coverage-tool is a pip package, not in-tree.
+search-path = ["Scripts", "."]
+use-ignore-files = true
