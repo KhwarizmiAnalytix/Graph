@@ -3,7 +3,10 @@
 
 Design follows KhwarizmiAnalytix/XSigma's Scripts/setup.py (dotted-token CLI,
 XSigmaFlags/XSigmaConfiguration split, coverage-tool integration) scaled down
-to the CMake options this standalone repo actually defines.
+to the CMake options this standalone repo actually defines
+(GRAPH_ENABLE_*/GRAPH_* in include/CMakeLists.txt) — there is no multi-module
+Library/* tree or --project.* scoping here, just one flat set of flags, and
+no backend selector (Graph has a single implementation, unlike Logging).
 
 Usage:
     python Scripts/setup.py config.build.test
@@ -36,7 +39,10 @@ except ImportError:  # Windows CLI smoke and some CI jobs skip pip install
     class Style:  # pylint: disable=too-few-public-methods
         RESET_ALL = ""
 
-from helpers import build as build_helper, config as config_helper, cppcheck as cppcheck_helper, test as test_helper
+from helpers import build as build_helper
+from helpers import config as config_helper
+from helpers import cppcheck as cppcheck_helper
+from helpers import test as test_helper
 
 DEBUG_FLAG = False
 
@@ -48,7 +54,7 @@ class ErrorLogger:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(exist_ok=True)
         self.log_file = (
-            self.log_dir / f"logging_build_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+            self.log_dir / f"graph_build_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         )
         self.errors = []
 
@@ -335,14 +341,13 @@ def debug_print(message):
         print(message)
 
 
-class LoggingFlags:
-    """Maps setup.py dotted tokens to Logging's LOGGING_* CMake cache variables.
+class GraphFlags:
+    """Maps setup.py dotted tokens to Graph's GRAPH_* CMake cache variables.
 
-    Scoped 1:1 to the options CMakeLists.txt actually defines — unlike XSigma's
-    XSigmaFlags there is no multi-module fan-out (Logging is a single flat
-    CMake target), no GPU/MKL/vectorization backends, and no --project.*
-    scoping. Logging does own a real backend selector (LOGGING_BACKEND: NATIVE,
-    LOGURU, GLOG, SPDLOG) — unlike Parallel, this one IS wired through.
+    Scoped 1:1 to the options include/CMakeLists.txt actually defines —
+    unlike XSigma's XSigmaFlags there is no multi-module fan-out (Graph is a
+    single flat CMake target), no GPU/MKL/vectorization backends, no backend
+    selector, and no --project.* scoping.
     """
 
     OFF = "OFF"
@@ -362,12 +367,6 @@ class LoggingFlags:
             "examples",
             "gtest",
             "benchmark",
-            "magicenum",
-            "cxademangle",
-            "portablefloat",
-            "stdformat",
-            "exceptionmode",
-            "backend",
             "icecc",
             "cache",
             "cache_type",
@@ -386,16 +385,10 @@ class LoggingFlags:
         ]
         self.__description = [
             "build shared (default) or static libraries",
-            "build the Logging test suite (LOGGING_ENABLE_TESTING; default ON)",
-            "build Logging example programs",
-            "enable GoogleTest for Logging (default ON; token disables it)",
-            "enable Google Benchmark for Logging (default ON; token disables it)",
-            "enable magic_enum static reflection (default ON; token disables it)",
-            "force Itanium ABI demangling on (default: auto-detected by CMake)",
-            "use the portable floating-point formatter instead of std::to_chars",
-            "use C++20 std::format instead of fmt (requires cxx20+)",
-            "default exception mode: throw (default) or logfatal",
-            "logging backend: native, loguru (default), glog, or spdlog",
+            "build the Graph test suite (GRAPH_ENABLE_TESTING; default ON)",
+            "build Graph example programs",
+            "enable GoogleTest for Graph (default ON; token disables it)",
+            "enable Google Benchmark for Graph (default OFF)",
             "use Icecream (icecc) distributed compiler",
             "enable per-target compiler cache launcher (default ON; token disables it)",
             "compiler cache backend: none, ccache, sccache, or buildcache",
@@ -417,30 +410,24 @@ class LoggingFlags:
         debug_print("Build cmake flag")
         self.__name = {
             "static": "BUILD_SHARED_LIBS",
-            "test": "LOGGING_ENABLE_TESTING",
-            "examples": "LOGGING_ENABLE_EXAMPLES",
-            "gtest": "LOGGING_ENABLE_GTEST",
-            "benchmark": "LOGGING_ENABLE_BENCHMARK",
-            "magicenum": "LOGGING_ENABLE_MAGICENUM",
-            "cxademangle": "LOGGING_ENABLE_CXA_DEMANGLE",
-            "portablefloat": "LOGGING_ENABLE_PORTABLE_FLOAT_FORMAT",
-            "stdformat": "LOGGING_FORMAT_USE_STD",
-            "exceptionmode": "LOGGING_DEFAULT_EXCEPTION_MODE",
-            "backend": "LOGGING_BACKEND",
-            "icecc": "LOGGING_ENABLE_ICECC",
-            "cache": "LOGGING_ENABLE_CACHE",
-            "cache_type": "LOGGING_CACHE_BACKEND",
-            "clangtidy": "LOGGING_ENABLE_CLANGTIDY",
-            "fix": "LOGGING_ENABLE_FIX",
-            "iwyu": "LOGGING_ENABLE_IWYU",
-            "sanitizer": "LOGGING_ENABLE_SANITIZER",
-            "sanitizer_enum": "LOGGING_SANITIZER_TYPE",
-            "spell": "LOGGING_ENABLE_SPELL",
-            "valgrind": "LOGGING_ENABLE_VALGRIND",
-            "linker": "LOGGING_LINKER_CHOICE",
-            "coverage": "LOGGING_ENABLE_COVERAGE",
-            "cxxstd": "LOGGING_CXX_STANDARD",
-            "lto": "LOGGING_LTO_MODE",
+            "test": "GRAPH_ENABLE_TESTING",
+            "examples": "GRAPH_ENABLE_EXAMPLES",
+            "gtest": "GRAPH_ENABLE_GTEST",
+            "benchmark": "GRAPH_ENABLE_BENCHMARK",
+            "icecc": "GRAPH_ENABLE_ICECC",
+            "cache": "GRAPH_ENABLE_CACHE",
+            "cache_type": "GRAPH_CACHE_BACKEND",
+            "clangtidy": "GRAPH_ENABLE_CLANGTIDY",
+            "fix": "GRAPH_ENABLE_FIX",
+            "iwyu": "GRAPH_ENABLE_IWYU",
+            "sanitizer": "GRAPH_ENABLE_SANITIZER",
+            "sanitizer_enum": "GRAPH_SANITIZER_TYPE",
+            "spell": "GRAPH_ENABLE_SPELL",
+            "valgrind": "GRAPH_ENABLE_VALGRIND",
+            "linker": "GRAPH_LINKER_CHOICE",
+            "coverage": "GRAPH_ENABLE_COVERAGE",
+            "cxxstd": "GRAPH_CXX_STANDARD",
+            "lto": "GRAPH_LTO_MODE",
             # "cppcheck" runs via Scripts/helpers/cppcheck.py after the build; no
             # CMakeLists.txt option consumes it (avoid an unused-var warning).
         }
@@ -451,19 +438,14 @@ class LoggingFlags:
         self.__process_arg_list(arg_list)
 
     def __set_default_flags(self):
-        # Mirrors CMakeLists.txt's option()/set() defaults exactly.
+        # Mirrors include/CMakeLists.txt's option()/set() defaults exactly.
         self.__value = dict.fromkeys(self.__key, self.OFF)
         self.__value.update(
             {
                 "static": self.ON,  # BUILD_SHARED_LIBS default is ON, so static=ON means "shared"
-                "test": self.ON,  # LOGGING_ENABLE_TESTING default ON
-                "gtest": self.ON,  # LOGGING_ENABLE_GTEST default ON
-                "benchmark": self.ON,  # LOGGING_ENABLE_BENCHMARK default ON
-                "magicenum": self.ON,  # LOGGING_ENABLE_MAGICENUM default ON
-                "cache": self.ON,  # LOGGING_ENABLE_CACHE default ON
-                "cxademangle": "",  # empty = let CMake auto-detect <cxxabi.h> support
-                "exceptionmode": "",  # empty = let CMake's default (THROW) apply
-                "backend": "",  # empty = let CMake's default (LOGURU) apply
+                "test": self.ON,  # GRAPH_ENABLE_TESTING default ON
+                "gtest": self.ON,  # GRAPH_ENABLE_GTEST default ON
+                "cache": self.ON,  # GRAPH_ENABLE_CACHE default ON
                 "cache_type": "none",
                 "linker": "default",
                 "cxxstd": "",  # empty = let CMake use its own default (20)
@@ -476,7 +458,6 @@ class LoggingFlags:
         sanitizer_list = ["address", "undefined", "thread", "memory", "leak"]
         cxx_std_list = ["cxx11", "cxx14", "cxx17", "cxx20", "cxx23"]
         cache_type_list = ["none", "ccache", "sccache", "buildcache"]
-        backend_list = ["native", "loguru", "glog", "spdlog"]
         linker_list = ["default", "mold", "lld", "gold", "lld-link"]
 
         self.builder_suffix = ""
@@ -488,15 +469,6 @@ class LoggingFlags:
                 self.__value["sanitizer"] = self.ON
                 self.__value["sanitizer_enum"] = arg
                 self.builder_suffix += f"_{arg}"
-            elif arg in backend_list:
-                self.__value["backend"] = arg.upper()
-                self.builder_suffix += f"_{arg}"
-                print_status(f"Selecting logging backend: {arg.upper()}", "INFO")
-            elif arg == "throw":
-                self.__value["exceptionmode"] = "THROW"
-            elif arg == "logfatal":
-                self.__value["exceptionmode"] = "LOG_FATAL"
-                self.builder_suffix += "_logfatal"
             elif arg.startswith("lto."):
                 lto_modes = ["off", "thin", "full", "ipo", "auto"]
                 lto_mode = arg.split(".", 1)[1].lower()
@@ -516,7 +488,8 @@ class LoggingFlags:
                     print_status(f"Setting linker to {linker_value}", "INFO")
                 else:
                     print_status(
-                        f"Unknown linker '{linker_value}'. Valid options: {', '.join(l for l in linker_list if l != 'default')}",
+                        f"Unknown linker '{linker_value}'. Valid options: "
+                        f"{', '.join(name for name in linker_list if name != 'default')}",
                         "ERROR",
                     )
                     sys.exit(1)
@@ -533,14 +506,14 @@ class LoggingFlags:
                 self.__value["cxxstd"] = std_version
                 print_status(f"Setting C++ standard to C++{std_version}", "INFO")
             elif arg in self.__key:
-                if arg in ("gtest", "benchmark", "cache", "magicenum"):
+                if arg in ("gtest", "cache"):
                     # CMake default ON: providing the token turns it OFF.
                     self.__value[arg] = self.OFF
                 elif arg == "lto":
                     self.__value["lto"] = "auto"
                     self.builder_suffix += "_lto_auto"
                 else:
-                    # CMake default OFF (or auto-detected): providing the token turns it ON.
+                    # CMake default OFF: providing the token turns it ON.
                     self.__value[arg] = self.ON
 
                 if arg not in ("test", "build", "benchmark"):
@@ -567,20 +540,6 @@ class LoggingFlags:
         if self.__value.get("spell") == self.ON:
             print_status("SPELL CHECKING ENABLED: Automatic spelling corrections will be applied during build!", "WARNING")
             print_status("Ensure you have committed your changes before building with this option.", "WARNING")
-
-        backend = self.__value.get("backend", "")
-        if backend and backend not in ["NATIVE", "LOGURU", "GLOG", "SPDLOG"]:
-            print_status(f"Invalid logging backend '{backend}'. Valid options: native, loguru, glog, spdlog", "ERROR")
-            sys.exit(1)
-
-        if self.__value.get("stdformat") == self.ON:
-            cxxstd = self.__value.get("cxxstd") or "20"
-            if int(cxxstd) < 20:
-                print_status(
-                    f"stdformat requires C++20 or newer (got cxx{cxxstd}); LOGGING_FORMAT_USE_STD will fail to configure.",
-                    "ERROR",
-                )
-                sys.exit(1)
 
     @staticmethod
     def find_case_insensitive(element, lst):
@@ -629,7 +588,9 @@ class LoggingFlags:
         return None
 
 
-class LoggingConfiguration:
+class GraphConfiguration:
+    """Drives config/build/test/coverage for Graph from parsed dotted-token args."""
+
     def __init__(self, args_list):
         missing_deps = check_dependencies()
         if missing_deps:
@@ -643,7 +604,7 @@ class LoggingConfiguration:
         self.summary_reporter = SummaryReporter()
 
         self.__initialize_values()
-        self.__logging_flags = LoggingFlags(args_list)
+        self.__graph_flags = GraphFlags(args_list)
         self.__fill_compilation_flags(args_list)
 
     def __initialize_values(self):
@@ -695,13 +656,13 @@ class LoggingConfiguration:
     def __set_ninja_flags(self):
         self.__value["cmake_generator"] = "Ninja"
         self.__value["builder"] = "ninja"
-        self.__value["build_folder"] = f"build_ninja{self.__logging_flags.builder_suffix}"
+        self.__value["build_folder"] = f"build_ninja{self.__graph_flags.builder_suffix}"
 
     def __set_xcode_flags(self):
         if self.__value["system"] == "Darwin" and check_xcode_availability():
             self.__value["cmake_generator"] = "Xcode"
             self.__value["builder"] = "xcodebuild"
-            self.__value["build_folder"] = f"build_xcode{self.__logging_flags.builder_suffix}"
+            self.__value["build_folder"] = f"build_xcode{self.__graph_flags.builder_suffix}"
             print_status("Using Xcode generator", "SUCCESS")
         else:
             if self.__value["system"] == "Darwin":
@@ -742,7 +703,7 @@ class LoggingConfiguration:
         }
         self.__value["cmake_generator"], base_build_folder = vs_versions[arg]
         self.__value["builder"] = "cmake"
-        self.__value["build_folder"] = f"{base_build_folder}{self.__logging_flags.builder_suffix}"
+        self.__value["build_folder"] = f"{base_build_folder}{self.__graph_flags.builder_suffix}"
         if not self.__compiler_user_specified:
             self.__value["cmake_cxx_compiler"] = ""
             self.__value["cmake_c_compiler"] = ""
@@ -757,7 +718,7 @@ class LoggingConfiguration:
         print_status("Configuring build...", "INFO")
         try:
             cmake_flags = []
-            self.__value["build_enum"] = self.__logging_flags.create_cmake_flags(
+            self.__value["build_enum"] = self.__graph_flags.create_cmake_flags(
                 cmake_flags, self.__value["build_enum"], self.__value["system"]
             )
             print(f"build enum: {self.__value['build_enum']}")
@@ -804,7 +765,7 @@ class LoggingConfiguration:
             sys.exit(1)
 
     def cppcheck(self, source_path, build_path):
-        if self.__value["build"] != "build" or not self.__logging_flags.is_cppcheck():
+        if self.__value["build"] != "build" or not self.__graph_flags.is_cppcheck():
             return 0
         print_status("Starting static code analysis with cppcheck...", "INFO")
         try:
@@ -834,7 +795,7 @@ class LoggingConfiguration:
     def test(self, source_path, build_path):
         if self.__value["test"] != "test":
             return 0
-        if self.__logging_flags.is_valgrind():
+        if self.__graph_flags.is_valgrind():
             exit_code = test_helper.run_valgrind_test(source_path, build_path, self.__shell_flag())
             self.summary_reporter.add_valgrind_report(build_path, exit_code)
             return exit_code
@@ -844,12 +805,12 @@ class LoggingConfiguration:
             self.__value["system"],
             self.__value["verbosity"],
             self.__shell_flag(),
-            sanitizer_type=self.__logging_flags.get_sanitizer_type(),
+            sanitizer_type=self.__graph_flags.get_sanitizer_type(),
             source_path=source_path,
         )
 
     def coverage(self, source_path, build_path):
-        if self.__value["build"] != "build" or not self.__logging_flags.is_coverage():
+        if self.__value["build"] != "build" or not self.__graph_flags.is_coverage():
             return 0
         print_status("Starting code coverage collection and report generation...", "INFO")
         try:
@@ -907,14 +868,6 @@ def parse_args(args):
             else:
                 print_status(f"Invalid LTO mode '{lto_mode}'. Valid options: {', '.join(valid_lto_modes)}", "ERROR")
                 sys.exit(1)
-        elif arg.startswith("--backend."):
-            backend_value = arg.split(".", 1)[1].lower()
-            valid_backends = ["native", "loguru", "glog", "spdlog"]
-            if backend_value in valid_backends:
-                processed_args.append(backend_value)
-            else:
-                print_status(f"Invalid logging backend: {backend_value}. Valid options: {', '.join(valid_backends)}", "ERROR")
-                sys.exit(1)
         elif arg.startswith("--linker."):
             processed_args.append(f"linker.{arg.split('.', 1)[1].lower()}")
         elif re.search(r"[/\\]", arg) and re.search(r"[Cc]lang|[Gg][Cc][Cc]|[Gg]\+\+", arg):
@@ -927,13 +880,13 @@ def parse_args(args):
 
 
 def main():
+    """Parse CLI args and drive config/build/test/coverage, or print --help."""
     if len(sys.argv) == 2 and sys.argv[1] == "--help":
-        print_status("Logging Build Configuration Helper", "INFO")
+        print_status("Graph Build Configuration Helper", "INFO")
         print("\n" + "=" * 80)
         print("DEFAULT CONFIGURATION:")
         print("  Build System: Ninja (fast, cross-platform)")
         print("  Compiler:     Clang (clang/clang++)")
-        print("  Backend:      Loguru (LOGGING_BACKEND default)")
         print("=" * 80)
         print("\nUsage examples:")
         print("  1. Default build (Ninja + Clang):")
@@ -944,10 +897,6 @@ def main():
         print("     setup.py config.build.test.xcode")
         print("  4. Build with coverage (analysis runs automatically):")
         print("     setup.py config.build.test.coverage")
-        print("  5. Build against a specific logging backend:")
-        print("     setup.py config.build.test.glog")
-        print("     setup.py config.build.test.spdlog")
-        print("     setup.py config.build.test --backend.native")
         print("\nBuild commands:")
         print("  config    - Configure the build system")
         print("  build     - Build the project")
@@ -956,7 +905,7 @@ def main():
         print("\nSanitizer flags:")
         print("  --sanitizer.address | .undefined | .thread | .memory | .leak")
         print("\nAvailable options:")
-        LoggingFlags([]).helper()
+        GraphFlags([]).helper()
         return
 
     try:
@@ -966,7 +915,7 @@ def main():
             sys.exit(1)
 
         print_status(f"Starting build configuration for {platform.system()}", "INFO")
-        compilation_calc = LoggingConfiguration(arg_list)
+        compilation_calc = GraphConfiguration(arg_list)
 
         source_path = os.path.dirname(os.getcwd())
         build_path = compilation_calc.move_to_build_folder()

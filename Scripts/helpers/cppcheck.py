@@ -8,9 +8,10 @@ import subprocess
 from dataclasses import dataclass
 from typing import Optional
 
-# Source directories that make up the Logging library (mirrors CMakeLists.txt's
-# GLOB_RECURSE root minus Testing/ and ThirdParty/).
-_SOURCE_DIRS = ["common", "logger", "util"]
+# Source directories that make up the Graph library (mirrors
+# include/CMakeLists.txt's file(GLOB_RECURSE ...) root: include/**/*.cpp,
+# minus Testing/ and ThirdParty/).
+_SOURCE_DIRS = ["include"]
 
 
 @dataclass

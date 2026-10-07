@@ -311,7 +311,7 @@ init_command = [
     '-m',
     'lint_tool.adapters.pip_init',
     '--dry-run={{DRYRUN}}',
-    'lint-import-linter>=1.0.0',
+    'import-linter>=2.0',
 ]
 command = [
     'python3',
@@ -605,17 +605,14 @@ exclude_patterns = [
 init_command = [
     'python3',
     '-m',
-    'lint_tool.adapters.s3_init',
-    '--linter=shellcheck',
+    'lint_tool.adapters.pip_init',
     '--dry-run={{DRYRUN}}',
-    '--output-dir=.lintbin',
-    '--output-name=shellcheck',
+    'shellcheck-py>=0.9.0',
 ]
 command = [
     'python3',
     '-m',
     'lint_tool.adapters.shellcheck_linter',
-    '--binary=.lintbin/shellcheck',
     '--',
     '@{{PATHSFILE}}',
 ]
