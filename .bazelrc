@@ -1,0 +1,34 @@
+# Keep WORKSPACE mode working alongside Bzlmod (same approach as XSigma).
+# Requires Bazel 7/8 — WORKSPACE-based repos (local_repository / new_local_repository
+# in WORKSPACE.bazel, wiring every ThirdParty/ submodule) are unsupported starting
+# with Bazel 9. See .bazelversion; bump only after migrating WORKSPACE.bazel to
+# bzlmod (MODULE.bazel) equivalents (e.g. local_path_override / a repo rule).
+build --enable_workspace
+
+# Auto-select the build:<os>/test:<os> blocks below for the host platform
+# (linux/macos/windows), so cross-platform flags don't need --config.
+common --enable_platform_specific_config
+
+# C++20 by default (mirrors GRAPH_CXX_STANDARD=20 in include/CMakeLists.txt).
+# MSVC takes /std:c++20, not -std=c++20 — unlike graph_copts()/xsigma_copts()
+# (bazel/xsigma.bzl), which already select() this per target, this applies to
+# every target including third-party deps, so it must be split per OS too.
+build:linux --cxxopt=-std=c++20 --host_cxxopt=-std=c++20
+build:macos --cxxopt=-std=c++20 --host_cxxopt=-std=c++20
+build:windows --cxxopt=/std:c++20 --host_cxxopt=/std:c++20
+
+# ThirdParty/Parallel is vendored as a plain subdirectory of this workspace, not
+# its own Bazel repository (see bazel/parallel.bzl). Two extra include roots are
+# needed, neither of which this repo can add via target-level `includes`
+# without editing the vendored BUILD.bazel (see .augment/rules/ThirdParty.md),
+# same reasoning as the C++20 block above:
+#   - ThirdParty/Parallel/Parallel  so Graph's own #include <parallel.h>
+#     (include/graph_executor.h) resolves — mirrors CMake's
+#     target_include_directories(Parallel PUBLIC .../Parallel) in
+#     ThirdParty/CMakeLists.txt's xsigma_add_parallel().
+#   - ThirdParty/Parallel            so Parallel's OWN internal headers, which
+#     quote-include themselves as "Parallel/common/parallel_export.h" (relative
+#     to ITS repo root), keep resolving once vendored one level deeper here.
+build:linux --copt=-IThirdParty/Parallel/Parallel --copt=-IThirdParty/Parallel
+build:macos --copt=-IThirdParty/Parallel/Parallel --copt=-IThirdParty/Parallel
+build:windows --copt=/IThirdParty/Parallel/Parallel --copt=/IThirdParty/Parallel

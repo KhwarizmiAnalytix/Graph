@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+# Graph CMake configuration file
+# Enables: find_package(Graph CONFIG REQUIRED)
+
+include(CMakeFindDependencyMacro)
+
+# Graph always links Parallel::Parallel (see xsigma_add_parallel() in
+# include/CMakeLists.txt). Parallel installs its own ParallelConfig.cmake
+# (see Parallel/CMakeLists.txt), so it is discoverable the same way here.
+find_dependency(Parallel)
+
+include("${CMAKE_CURRENT_LIST_DIR}/GraphTargets.cmake")
+
+check_required_components(Graph)

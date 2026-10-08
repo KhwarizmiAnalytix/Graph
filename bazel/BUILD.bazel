@@ -1,0 +1,56 @@
+# =============================================================================
+# Graph — Bazel Configuration Settings (standalone)
+# =============================================================================
+# Starlark --define keys mirror this repo's CMake cache names: build_shared_libs.
+#
+# The parallel_* / enable_openmp settings below exist only so that
+# ThirdParty/Parallel/BUILD.bazel's and ThirdParty/Parallel/bazel/parallel.bzl's
+# own select({"//bazel:...": ...}) calls — absolute labels, always anchored to
+# this (the only) workspace's root //bazel package, see parallel.bzl in this
+# directory — have a target to resolve to; they mirror
+# ThirdParty/Parallel/bazel/BUILD.bazel's own (unused, since that file is
+# never loaded standalone here) config_settings and must not be renamed
+# independently of it.
+# =============================================================================
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "xsigma.bzl",
+    "graph.bzl",
+    "parallel.bzl",
+])
+
+# =============================================================================
+# Library Type Configuration
+# =============================================================================
+
+config_setting(
+    name = "shared_libs",
+    define_values = {"build_shared_libs": "true"},
+)
+
+# --- ThirdParty/Parallel compatibility (see parallel.bzl in this directory) ---
+
+# Legacy opt-in flag (parallel_enable_openmp=true) — PARALLEL_BACKEND=openmp is preferred.
+config_setting(
+    name = "enable_openmp",
+    define_values = {"parallel_enable_openmp": "true"},
+)
+
+# CMake PARALLEL_BACKEND=openmp|tbb — drives Parallel's SMP backend (default std).
+config_setting(
+    name = "parallel_backend_openmp",
+    define_values = {"parallel_backend": "openmp"},
+)
+
+config_setting(
+    name = "parallel_backend_tbb",
+    define_values = {"parallel_backend": "tbb"},
+)
+
+# Legacy opt-in flag (parallel_enable_tbb=true) — PARALLEL_BACKEND=tbb is preferred.
+config_setting(
+    name = "parallel_enable_tbb",
+    define_values = {"parallel_enable_tbb": "true"},
+)

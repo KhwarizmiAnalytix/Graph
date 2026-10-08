@@ -178,6 +178,41 @@ install(
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/" DESTINATION include/Graph
         FILES_MATCHING PATTERN "*.h" PATTERN "Testing" EXCLUDE)
 
+install(
+  EXPORT GraphTargets
+  NAMESPACE Graph::
+  FILE GraphTargets.cmake
+  DESTINATION lib/cmake/Graph
+)
+
+# --- CMake Package Configuration Files ---
+# Only generated/installed for a standalone Graph build: PROJECT_VERSION
+# (consumed by write_basic_package_version_file below) reflects Graph's own
+# version only when Graph's own project() call ran (see root CMakeLists.txt).
+# When Graph is embedded via add_subdirectory(), the host project owns its
+# own packaging.
+if(GRAPH_STANDALONE)
+  include(CMakePackageConfigHelpers)
+
+  configure_package_config_file(
+    "${CMAKE_SOURCE_DIR}/Cmake/GraphConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/GraphConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/Graph
+  )
+
+  write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/GraphConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+  )
+
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/GraphConfig.cmake"
+          "${CMAKE_CURRENT_BINARY_DIR}/GraphConfigVersion.cmake"
+    DESTINATION lib/cmake/Graph
+  )
+endif()
+
 if(GRAPH_ENABLE_TESTING)
   add_subdirectory(${CMAKE_SOURCE_DIR}/Testing/Cxx ${CMAKE_BINARY_DIR}/Testing/Cxx)
 endif()

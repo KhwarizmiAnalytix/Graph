@@ -1,0 +1,121 @@
+# Standalone Graph library. Include root is the repository root; public headers live under
+# include/ (e.g. #include "common/graph_export.h", #include "graph_types.h"). Graph always
+# links Parallel (vendored as ThirdParty/Parallel, a plain subdirectory of this workspace —
+# see bazel/parallel.bzl); clients include <parallel.h>, resolved via the
+# -IThirdParty/Parallel/Parallel copt in .bazelrc.
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_pkg//pkg:install.bzl", "pkg_install")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
+load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
+load("//bazel:graph.bzl", "graph_copts", "graph_defines", "graph_linkopts")
+
+package(default_visibility = ["//visibility:public"])
+
+# =============================================================================
+# Source File Groups
+# =============================================================================
+
+filegroup(
+    name = "graph_hdrs",
+    srcs = glob(
+        [
+            "include/*.h",
+            "include/common/*.h",
+        ],
+        allow_empty = True,
+    ),
+)
+
+filegroup(
+    name = "graph_srcs",
+    srcs = glob(
+        ["include/*.cpp"],
+        allow_empty = True,
+    ),
+)
+
+# =============================================================================
+# Graph implementation library
+# =============================================================================
+
+cc_library(
+    name = "graph_lib",
+    srcs = [":graph_srcs"],
+    hdrs = [":graph_hdrs"],
+    copts = graph_copts(),
+    defines = graph_defines() + select({
+        "//bazel:shared_libs": ["GRAPH_SHARED_DEFINE"],
+        "//conditions:default": ["GRAPH_STATIC_DEFINE"],
+    }),
+    local_defines = select({
+        "//bazel:shared_libs": ["GRAPH_BUILDING_DLL"],
+        "//conditions:default": [],
+    }),
+    # No includes attribute: the package is the workspace root, so Bazel's default
+    # -iquote <workspace_root> already resolves "common/..." headers.
+    # (includes = ["."] is rejected at the workspace root by Bazel 8+.)
+    linkopts = graph_linkopts(),
+    linkstatic = select({
+        "//bazel:shared_libs": False,
+        "//conditions:default": True,
+    }),
+    # Graph always links Parallel::Parallel (CMake: xsigma_add_parallel() in
+    # include/CMakeLists.txt). Parallel is pure third-party with no XSigma-library
+    # dependency of its own, so this keeps Graph's dependency footprint minimal.
+    deps = ["//ThirdParty/Parallel:Parallel"],
+    alwayslink = False,
+    visibility = ["//visibility:public"],
+)
+
+# =============================================================================
+# Public Graph target
+# =============================================================================
+
+cc_library(
+    name = "Graph",
+    deps = [":graph_lib"],
+    visibility = ["//visibility:public"],
+)
+
+# =============================================================================
+# Install / export (bazel-side analogue of CMake's `install(TARGETS ...)` /
+# `install(DIRECTORY include/ DESTINATION include/Graph ...)` in
+# include/CMakeLists.txt). `bazel build //:graph_pkg_tar` produces a
+# relocatable tarball; `bazel run //:install -- --destdir=/some/prefix`
+# stages the same tree directly on disk.
+# =============================================================================
+
+pkg_files(
+    name = "graph_installed_hdrs",
+    srcs = glob(
+        [
+            "include/*.h",
+            "include/common/*.h",
+        ],
+        allow_empty = True,
+    ),
+    prefix = "include/Graph",
+    strip_prefix = strip_prefix.from_pkg("include"),
+)
+
+pkg_files(
+    name = "graph_installed_libs",
+    srcs = [":graph_lib"],
+    prefix = "lib",
+)
+
+pkg_tar(
+    name = "graph_pkg_tar",
+    srcs = [
+        ":graph_installed_hdrs",
+        ":graph_installed_libs",
+    ],
+)
+
+pkg_install(
+    name = "install",
+    srcs = [
+        ":graph_installed_hdrs",
+        ":graph_installed_libs",
+    ],
+)

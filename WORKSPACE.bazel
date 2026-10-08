@@ -1,0 +1,47 @@
+# =============================================================================
+# Graph — Bazel workspace (standalone)
+# =============================================================================
+# Standalone Bazel build for the Graph library. When consumed from XSigma,
+# XSigma's own workspace provides an overlay BUILD file instead — do not edit
+# this repo's vendored third-party trees.
+# =============================================================================
+
+workspace(name = "xsigma_graph")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# =============================================================================
+# Bazel Skylib
+# =============================================================================
+http_archive(
+    name = "bazel_skylib",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
+    ],
+)
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
+
+# =============================================================================
+# OpenMP host probe for ThirdParty/Parallel — mirrors what Parallel's own
+# WORKSPACE.bazel does standalone. Parallel is vendored here as a plain
+# subdirectory of this workspace, not its own Bazel repository (see
+# bazel/parallel.bzl), but ThirdParty/Parallel/bazel/parallel.bzl
+# unconditionally does load("@parallel_openmp//:config.bzl", ...) at the top
+# of the file regardless of which backend ends up selected, so the
+# @parallel_openmp repository must exist for that file to even load.
+#
+# Loaded from this workspace's OWN bazel/openmp_configure.bzl (a duplicate of
+# ThirdParty/Parallel/bazel/openmp_configure.bzl) rather than straight from
+# the vendored submodule: a WORKSPACE-phase load() that reaches into
+# ThirdParty/Parallel — which has its own nested WORKSPACE.bazel/MODULE.bazel
+# from its standalone-repo setup — trips Bazel's main-repo-mapping
+# computation into a dependency cycle. BUILD-phase loads into the same
+# submodule (see bazel/parallel.bzl) are unaffected and work fine.
+# =============================================================================
+load("//bazel:openmp_configure.bzl", "openmp_configure")
+
+openmp_configure(name = "parallel_openmp")
