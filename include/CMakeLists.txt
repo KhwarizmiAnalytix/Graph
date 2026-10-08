@@ -115,7 +115,15 @@ if(NOT TARGET Parallel::Parallel)
       "is ThirdParty/Parallel initialized?"
   )
 endif()
-list(APPEND GRAPH_DEPENDENCY_LIBS Parallel::Parallel)
+# Parallel::Parallel is a vendored in-tree, non-IMPORTED target (added via
+# xsigma_add_parallel() above) with no installable package identity of its
+# own. Referencing it unqualified in a PUBLIC link makes
+# install(EXPORT GraphTargets ...) fail with "... requires target ... that
+# is not in any export set" (same issue as Vectorization's Logging/Memory
+# dependencies; see include/CMakeLists.txt there). Wrapping it in
+# $<BUILD_INTERFACE:...> keeps this build working but drops it from
+# GraphTargets.cmake's INTERFACE_LINK_LIBRARIES for downstream consumers.
+list(APPEND GRAPH_DEPENDENCY_LIBS $<BUILD_INTERFACE:Parallel::Parallel>)
 
 if(BUILD_SHARED_LIBS)
   target_compile_definitions(Graph PUBLIC GRAPH_SHARED_DEFINE PRIVATE GRAPH_BUILDING_DLL)
