@@ -1,5 +1,9 @@
 # Graph
 
+[![CI](https://github.com/KhwarizmiAnalytix/Graph/actions/workflows/ci.yml/badge.svg)](https://github.com/KhwarizmiAnalytix/Graph/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/KhwarizmiAnalytix/Graph/branch/main/graph/badge.svg)](https://codecov.io/gh/KhwarizmiAnalytix/Graph)
+[![License: GPL v3 / Commercial](https://img.shields.io/badge/license-GPL--3.0--or--later%20%2F%20commercial-blue.svg)](LICENSE)
+
 Standalone C++20 Graph library extracted from XSigma. Public target: `Graph::Graph`.
 
 ```sh
