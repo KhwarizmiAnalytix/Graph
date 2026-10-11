@@ -1,6 +1,6 @@
 # Graph
 
-[![CI](https://github.com/KhwarizmiAnalytix/Graph/actions/workflows/ci.yml/badge.svg)](https://github.com/KhwarizmiAnalytix/Graph/actions/workflows/ci.yml)
+[![CI](https://github.com/KhwarizmiAnalytix/Graph/actions/workflows/build.yml/badge.svg)](https://github.com/KhwarizmiAnalytix/Graph/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/KhwarizmiAnalytix/Graph/branch/main/graph/badge.svg)](https://codecov.io/gh/KhwarizmiAnalytix/Graph)
 [![License: GPL v3 / Commercial](https://img.shields.io/badge/license-GPL--3.0--or--later%20%2F%20commercial-blue.svg)](LICENSE)
 
