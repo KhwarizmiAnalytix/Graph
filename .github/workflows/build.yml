@@ -88,3 +88,101 @@ jobs:
           python3 -m lintrunner --version
           python3 -m lintrunner init
           python3 -m lintrunner run --show-stats
+
+  # ---------------------------------------------------------------------------
+  # Coverage: gcc/gcov+lcov (Linux), Homebrew LLVM/clang (macOS), MSVC/OpenCppCoverage
+  # (Windows). Pass --compiler explicitly: macOS's default /usr/bin/c++ is AppleClang
+  # with CMAKE_CXX_COMPILER=/usr/bin/c++, and coverage-tool cannot map that path
+  # (no "clang" in the filename) when CMAKE_CXX_COMPILER_ID is not a cache entry.
+  # Homebrew llvm also keeps llvm-cov matched to the compiler that instrumented
+  # the binaries. Codecov upload stays Linux/lcov-only.
+  # ---------------------------------------------------------------------------
+  coverage:
+    name: Coverage / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      CC: ${{ matrix.os == 'ubuntu-latest' && 'gcc' || '' }}
+      CXX: ${{ matrix.os == 'ubuntu-latest' && 'g++' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install tools (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build lcov
+
+      - name: Install tools (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install ninja llvm
+          LLVM_PREFIX="$(brew --prefix llvm)"
+          echo "${LLVM_PREFIX}/bin" >> "$GITHUB_PATH"
+          echo "CC=${LLVM_PREFIX}/bin/clang" >> "$GITHUB_ENV"
+          echo "CXX=${LLVM_PREFIX}/bin/clang++" >> "$GITHUB_ENV"
+
+      - name: Install tools (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install -y opencppcoverage
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install coverage-tool
+        run: pip install "git+https://github.com/KhwarizmiAnalytix/coverage-tool.git"
+
+      - name: Configure (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Debug
+          -DGRAPH_ENABLE_BENCHMARK=OFF
+          -DGRAPH_ENABLE_COVERAGE=ON
+
+      - name: Configure (Windows)
+        if: matrix.os == 'windows-latest'
+        run: >
+          cmake -S . -B build
+          -DGRAPH_ENABLE_BENCHMARK=OFF
+          -DGRAPH_ENABLE_COVERAGE=ON
+
+      - name: Build (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: cmake --build build
+
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        run: cmake --build build --config Release
+
+      - name: Test (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Test (Windows)
+        if: matrix.os == 'windows-latest'
+        run: ctest --test-dir build --build-config Release --output-on-failure
+
+      - name: Collect coverage
+        run: >
+          coverage-tool --build=build
+          --compiler=${{ matrix.os == 'windows-latest' && 'msvc' || (matrix.os == 'macos-latest' && 'clang' || 'gcc') }}
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-${{ matrix.os }}
+          path: build/coverage_report/html
+
+      - name: Upload to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          files: build/coverage_filtered.info
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
