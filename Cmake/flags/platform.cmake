@@ -197,10 +197,27 @@ if(MSVC)
   string(APPEND CMAKE_CXX_FLAGS " /bigobj")
   string(APPEND CMAKE_C_FLAGS " /bigobj")
 
-  # Enable faster PDB generation
-  message(STATUS "  MSVC: enabling PDB debug info (/Zi)")
-  string(APPEND CMAKE_CXX_FLAGS " /Zi")
-  string(APPEND CMAKE_C_FLAGS " /Zi")
+  # Compiler caches cannot safely share a compiler PDB between concurrent
+  # invocations, even with /FS. Embed debug info in each object instead.
+  # Normalize legacy CMake defaults as well as CMP0141's target default.
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT Embedded)
+  set(_graph_debug_configs Debug Release RelWithDebInfo MinSizeRel ${CMAKE_CONFIGURATION_TYPES}
+                            ${CMAKE_BUILD_TYPE}
+  )
+  list(REMOVE_DUPLICATES _graph_debug_configs)
+  foreach(_language C CXX)
+    foreach(_config IN LISTS _graph_debug_configs)
+      string(TOUPPER "${_config}" _config_upper)
+      set(_flags_var "CMAKE_${_language}_FLAGS_${_config_upper}")
+      string(REGEX REPLACE "(^|[ \t])[-/]Z[iI]([ \t]|$)" "\\1/Z7\\2" ${_flags_var}
+                           "${${_flags_var}}"
+      )
+    endforeach()
+  endforeach()
+  message(STATUS "  MSVC: embedding debug info in object files (/Z7)")
+  string(APPEND CMAKE_CXX_FLAGS " /Z7")
+  string(APPEND CMAKE_C_FLAGS " /Z7")
+
 
   # Use /utf-8 so that MSVC uses utf-8 in source files and object files
   message(STATUS "  MSVC: setting source/output encoding to UTF-8 (/utf-8)")

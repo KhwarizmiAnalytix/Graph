@@ -189,8 +189,7 @@ jobs:
 
   # ---------------------------------------------------------------------------
   # Compiler cache (ccache/sccache) and Icecream (icecc) coverage across
-  # Linux, macOS, and Windows. buildcache is a valid GRAPH_CACHE_BACKEND value
-  # too but is out of scope here (needs a pinned installer script). icecc has
+  # Linux, macOS, and Windows. BuildCache runs in buildcache.yml. Icecc has
   # no Windows port, so there is no windows-icecc entry.
   # ---------------------------------------------------------------------------
   cache-icecc:
