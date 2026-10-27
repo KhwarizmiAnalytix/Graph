@@ -15,6 +15,7 @@ Usage:
 """
 
 import glob
+import importlib.util
 import os
 import platform
 import re
@@ -39,10 +40,12 @@ except ImportError:  # Windows CLI smoke and some CI jobs skip pip install
     class Style:  # pylint: disable=too-few-public-methods
         RESET_ALL = ""
 
-from helpers import build as build_helper
-from helpers import config as config_helper
-from helpers import cppcheck as cppcheck_helper
-from helpers import test as test_helper
+from helpers import (
+    build as build_helper,
+    config as config_helper,
+    cppcheck as cppcheck_helper,
+    test as test_helper,
+)
 
 DEBUG_FLAG = False
 
@@ -527,15 +530,15 @@ class GraphFlags:
             print_status("Coverage enabled but testing is disabled - enabling tests automatically.", "WARNING")
             self.__value["test"] = self.ON
 
-        if self.__value.get("coverage") == self.ON:
-            try:
-                import coverage_tool  # noqa: F401
-            except ImportError:
-                print_status(
-                    "coverage-tool is not installed. Install with: pip install coverage-tool",
-                    "ERROR",
-                )
-                sys.exit(1)
+        if (
+            self.__value.get("coverage") == self.ON
+            and importlib.util.find_spec("coverage_tool") is None
+        ):
+            print_status(
+                "coverage-tool is not installed. Install with: pip install coverage-tool",
+                "ERROR",
+            )
+            sys.exit(1)
 
         if self.__value.get("spell") == self.ON:
             print_status("SPELL CHECKING ENABLED: Automatic spelling corrections will be applied during build!", "WARNING")
