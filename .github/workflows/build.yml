@@ -191,9 +191,9 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   # ---------------------------------------------------------------------------
-  # Compiler cache (ccache/sccache) and Icecream (icecc) coverage across
-  # Linux, macOS, and Windows. BuildCache runs in buildcache.yml. Icecc has
-  # no Windows port, so there is no windows-icecc entry.
+  # Compiler cache (ccache/sccache/buildcache) and Icecream (icecc) coverage
+  # across Linux, macOS, and Windows. Icecc has no Windows port, so there is
+  # no windows-icecc entry.
   # ---------------------------------------------------------------------------
   cache-icecc:
     name: Cache & Icecc / ${{ matrix.name }}
@@ -230,6 +230,18 @@ jobs:
             os: windows-latest
             cmake_flags: --cache=ON --cache-backend=sccache
             sccache: true
+          - name: linux-buildcache
+            os: ubuntu-latest
+            cmake_flags: --cache=ON --cache-backend=buildcache
+            use_buildcache: true
+          - name: macos-buildcache
+            os: macos-latest
+            cmake_flags: --cache=ON --cache-backend=buildcache
+            use_buildcache: true
+          - name: windows-buildcache
+            os: windows-latest
+            cmake_flags: --cache=ON --cache-backend=buildcache
+            use_buildcache: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -257,6 +269,16 @@ jobs:
         uses: mozilla-actions/sccache-action@v0.0.9
         with:
           version: v0.12.0
+
+      - name: Set BuildCache directory
+        if: matrix.use_buildcache
+        shell: bash
+        run: echo "BUILDCACHE_DIR=$RUNNER_TEMP/buildcache-data" >> "$GITHUB_ENV"
+
+      - name: Install BuildCache
+        if: matrix.use_buildcache
+        shell: bash
+        run: python3 .github/scripts/install_buildcache.py --install-prefix "$RUNNER_TEMP/buildcache-tool"
 
       - name: Configure
         run: python3 "${{ github.workspace }}/Scripts/setup.py" config --compiler=default --source-dir . --build-dir build --generator Ninja --build-type=Release ${{ matrix.cmake_flags }}
