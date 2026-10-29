@@ -47,8 +47,8 @@ jobs:
         shell: bash
         run: python .github/scripts/install_buildcache.py --install-prefix "$RUNNER_TEMP/buildcache-tool"
 
-      - name: Check MSVC debug flag regression
-        run: python -m unittest discover -s Testing/CMake -p test_platform.py -v
+      - name: Check CMake option and MSVC debug flag regressions
+        run: python -m unittest discover -s Testing/CMake -v
 
       - name: Configure
         run: >
