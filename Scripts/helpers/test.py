@@ -34,7 +34,7 @@ def run_ctest(
         Exit code (0 for success, non-zero for failure)
     """
     try:
-        ctest_cmd = ["ctest"]
+        ctest_cmd = ["ctest", "--output-on-failure", "--no-tests=error"]
 
         if system == "Windows" and builder != "ninja":
             ctest_cmd.extend(["-C", build_enum])
@@ -46,20 +46,27 @@ def run_ctest(
         env = os.environ.copy()
 
         if sanitizer_type and source_path:
-            suppressions_file = os.path.join(
-                source_path,
-                "Scripts",
-                "suppressions",
-                f"{sanitizer_type}san_suppressions.txt",
-            )
-            if os.path.exists(suppressions_file):
-                sanitizer_option = f"{sanitizer_type.upper()}SAN_OPTIONS"
-                env[sanitizer_option] = (
-                    f"suppressions={suppressions_file}:print_suppressions=1"
+            for selected_type in sanitizer_type.split(","):
+                suppressions_file = os.path.join(
+                    source_path,
+                    "Scripts",
+                    "suppressions",
+                    f"{selected_type}san_suppressions.txt",
                 )
+                if os.path.exists(suppressions_file):
+                    option = {
+                        "address": "ASAN_OPTIONS",
+                        "undefined": "UBSAN_OPTIONS",
+                        "thread": "TSAN_OPTIONS",
+                        "memory": "MSAN_OPTIONS",
+                        "leak": "LSAN_OPTIONS",
+                    }[selected_type]
+                    existing = env.get(option, "")
+                    addition = f"suppressions={suppressions_file}:print_suppressions=1"
+                    env[option] = existing + (":" if existing else "") + addition
 
         return subprocess.check_call(
-            ctest_cmd, stderr=subprocess.STDOUT, shell=shell_flag, env=env
+            ctest_cmd, stderr=subprocess.STDOUT, shell=False, env=env
         )
 
     except subprocess.CalledProcessError:
@@ -94,7 +101,7 @@ def run_valgrind_test(source_path: str, build_path: str, shell_flag: bool) -> in
         return subprocess.call(
             [script_full_path, build_path],
             stdin=subprocess.PIPE,
-            shell=shell_flag,
+            shell=False,
         )
     except Exception:
         return 1

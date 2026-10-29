@@ -38,17 +38,24 @@ def configure_build(
         Exit code (0 for success, non-zero for failure)
     """
     try:
-        build_folder = f"-B {build_path}"
-        source_folder = f"-S {source_path}"
-
         cmake_cmd = [
             "cmake",
-            source_folder,
-            build_folder,
+            "-S",
+            source_path,
+            "-B",
+            build_path,
             "-G",
             cmake_generator,
             arg_cmake_verbose,
         ]
+
+        if (
+            cmake_generator.startswith("Visual Studio")
+            and "=clang-cl" in cmake_cxx_compiler
+        ):
+            generator_toolset = "ClangCL"
+            cmake_cxx_compiler = ""
+            cmake_c_compiler = ""
 
         if generator_toolset:
             cmake_cmd.extend(["-T", generator_toolset])
@@ -60,7 +67,7 @@ def configure_build(
 
         cmake_cmd.extend(cmake_flags)
 
-        subprocess.check_call(cmake_cmd, stderr=subprocess.STDOUT, shell=shell_flag)
+        subprocess.check_call(cmake_cmd, stderr=subprocess.STDOUT, shell=False)
         return 0
 
     except subprocess.CalledProcessError:

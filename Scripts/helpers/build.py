@@ -81,7 +81,7 @@ def build_project(builder: str, build_enum: str, system: str, shell_flag: bool) 
             return 1
 
         _raise_stack_limit()
-        subprocess.check_call(cmake_cmd_build, stderr=subprocess.STDOUT, shell=shell_flag)
+        subprocess.check_call(cmake_cmd_build, stderr=subprocess.STDOUT, shell=False)
         return 0
 
     except subprocess.CalledProcessError:
